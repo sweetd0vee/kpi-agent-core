@@ -34,8 +34,14 @@ def main():
     )
     parser.add_argument(
         "--out", "-o",
-        default="out/embed_result.json",
-        help="Файл для сохранения результата (по умолчанию out/embed_result.json)",
+        default=None,
+        help="Полный путь для сохранения результата (например out/embed.json)",
+    )
+    parser.add_argument(
+        "--name", "-n",
+        default=None,
+        metavar="FILE",
+        help="Название результирующего файла (сохраняется в out/FILE, по умолчанию embed_result.json)",
     )
     parser.add_argument(
         "--type",
@@ -53,6 +59,17 @@ def main():
         help=f"URL Ollama (по умолчанию {DEFAULT_OLLAMA_BASE_URL})",
     )
     args = parser.parse_args()
+
+    # Путь результата: --out имеет приоритет, иначе out/<--name или out/embed_result.json
+    if args.out is not None:
+        save_path = args.out
+    elif args.name is not None:
+        name = args.name.strip()
+        if not name.endswith(".json"):
+            name = name + ".json"
+        save_path = str(Path("out") / name)
+    else:
+        save_path = "out/embed_result.json"
 
     if args.file:
         path = Path(args.file)
@@ -81,7 +98,7 @@ def main():
             document_id=path.stem,
             model=args.model,
             base_url=args.base_url,
-            save_path=args.out,
+            save_path=save_path,
         )
     except Exception as e:
         print("Ошибка:", e)
@@ -89,7 +106,7 @@ def main():
 
     dim = len(result["embedding"])
     print(f"Готово. Размерность вектора: {dim}")
-    print(f"Результат сохранён в: {args.out}")
+    print(f"Результат сохранён в: {save_path}")
 
 
 if __name__ == "__main__":
