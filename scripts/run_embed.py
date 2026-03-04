@@ -99,6 +99,7 @@ def main():
             model=args.model,
             base_url=args.base_url,
             save_path=save_path,
+            source_path=path.resolve(),
         )
     except Exception as e:
         print("Ошибка:", e)

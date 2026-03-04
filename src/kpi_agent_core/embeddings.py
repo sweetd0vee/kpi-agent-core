@@ -68,11 +68,13 @@ def embed_document(
     model: str = DEFAULT_EMBED_MODEL,
     base_url: str = DEFAULT_OLLAMA_BASE_URL,
     save_path: Optional[Union[str, Path]] = None,
+    source_path: Optional[Union[str, Path]] = None,
     timeout: float = 120.0,
 ) -> dict[str, Any]:
     """
     Создать эмбеддинг для готового текста (например пронумерованный чеклист),
-    опционально сохранить результат.
+    опционально сохранить результат. source_path сохраняется в JSON для последующего
+    поиска по релевантности и подстановки полного текста в каскад.
 
     :param text: готовый текст документа (чеклист и т.д.)
     :param document_type: тип документа (business_plan_checklist, strategy_checklist и т.д.)
@@ -80,29 +82,36 @@ def embed_document(
     :param model: модель Ollama для эмбеддингов
     :param base_url: базовый URL Ollama
     :param save_path: если задан — сохранить результат в JSON (embedding + метаданные)
+    :param source_path: путь к исходному .txt — сохраняется в JSON для retrieval (загрузка полного текста)
     :param timeout: таймаут запроса (секунды)
     :return: embedding, text_preview, document_type, model, document_id
     """
     prepared = document_to_embedding_text(text, document_type=document_type)
+    # Эмбеддинг создаётся для всего текста документа (без обрезки)
     embedding = get_embedding_ollama(prepared, model=model, base_url=base_url, timeout=timeout)
     text_preview = prepared[:2000] + ("..." if len(prepared) > 2000 else "")
+    src_str = str(source_path) if source_path else None
     result = {
         "embedding": embedding,
         "text_preview": text_preview,
+        "text_full": prepared,
         "document_type": document_type,
         "model": model,
         "document_id": document_id,
+        "source_path": src_str,
     }
     if save_path is not None:
         path = Path(save_path)
         path.parent.mkdir(parents=True, exist_ok=True)
-        # В файл сохраняем полный текст и вектор, чтобы не терять данные
+        # Сохраняем полный текст, чтобы при retrieval использовать весь документ
         to_save = {
             "embedding": result["embedding"],
             "text_preview": result["text_preview"],
+            "text_full": prepared,
             "document_type": result["document_type"],
             "model": result["model"],
             "document_id": result["document_id"],
+            "source_path": src_str,
             "text_length": len(prepared),
         }
         path.write_text(json.dumps(to_save, ensure_ascii=False, indent=2), encoding="utf-8")
