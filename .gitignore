@@ -26,6 +26,7 @@ env/
 
 # Output / artifacts
 output/
+out/
 embed_result.json
 *.embed.json
 
@@ -48,3 +49,6 @@ logs/
 # OS
 .DS_Store
 Thumbs.db
+
+# files
+raw/

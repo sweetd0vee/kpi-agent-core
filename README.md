@@ -13,13 +13,16 @@
 
 ## Установка
 
-Из корня репозитория (или из папки `kpi-agent-core`):
+Рекомендуется **обычная установка** (без `-e`), т.к. `pip install -e .` на старом pip под Windows часто падает (deprecated `develop`, "No module named pip" в build env):
 
 ```bash
-pip install -e ./kpi-agent-core
+cd kpi-agent-core
+pip install .
 ```
 
-Зависимости: `pydantic`, `langgraph`, `langchain-core`.
+Из корня репозитория: `pip install ./kpi-agent-core`
+
+Зависимости: `pydantic`, `langgraph`, `langchain-core`, `httpx`. После правок в коде ядра переустановите: `pip install .`
 
 ## Использование из бэкенда
 
@@ -67,17 +70,19 @@ result = embed_document(
    ollama pull qwen3-embedding
    ```
 
-2. Из папки **kpi-agent-core** (установлено ядро: `pip install .` или `pip install -e .`):
+2. Установите ядро (один раз): `pip install .` из папки `kpi-agent-core`. Не используйте `pip install -e .` — на старом pip под Windows это может падать.
+
+3. Запуск скрипта (из папки `kpi-agent-core`):
    ```bash
    cd kpi-agent-core
-   python scripts/run_embed.py
+   python scripts/run_embed.py "путь\к\документу.txt"
    ```
-   Скрипт возьмёт документ из `../kpi-agent-backend/uploads/business_plan_checklist/` и сохранит результат в `embed_result.json`.
+   Результат по умолчанию: `out/embed_result.json`.
 
-3. Свои файл и выход:
+4. Свой выход и тип документа:
    ```bash
-   python scripts/run_embed.py path/to/checklist.txt --out my_embed.json
-   python scripts/run_embed.py path/to/doc.txt --type strategy_checklist -o out.json
+   python scripts/run_embed.py path/to/checklist.txt -o out/my_embed.json
+   python scripts/run_embed.py path/to/doc.txt --type strategy_checklist -o out/strategy.json
    ```
 
 ## Запуск тестов

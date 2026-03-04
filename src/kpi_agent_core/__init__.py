@@ -17,7 +17,6 @@ from kpi_agent_core.prompts import (
     CHAT_SYSTEM_PROMPT,
     EMBED_DOCUMENT_TEMPLATE,
 )
-from kpi_agent_core.graph import build_cascade_graph
 from kpi_agent_core.embeddings import (
     document_to_embedding_text,
     get_embedding_ollama,
@@ -25,6 +24,14 @@ from kpi_agent_core.embeddings import (
     DEFAULT_EMBED_MODEL,
     DEFAULT_OLLAMA_BASE_URL,
 )
+
+# Ленивый импорт графа: не тянет langgraph/uuid_utils при использовании только эмбеддингов (скрипт run_embed)
+def __getattr__(name):
+    if name == "build_cascade_graph":
+        from kpi_agent_core.graph import build_cascade_graph
+        return build_cascade_graph
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
 
 __all__ = [
     "CascadeState",

@@ -5,7 +5,7 @@
 """
 import json
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any, Optional, Union
 
 import httpx
 
@@ -67,7 +67,7 @@ def embed_document(
     document_id: Optional[str] = None,
     model: str = DEFAULT_EMBED_MODEL,
     base_url: str = DEFAULT_OLLAMA_BASE_URL,
-    save_path: Optional[str | Path] = None,
+    save_path: Optional[Union[str, Path]] = None,
     timeout: float = 120.0,
 ) -> dict[str, Any]:
     """

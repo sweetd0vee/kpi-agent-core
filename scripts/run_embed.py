@@ -20,7 +20,8 @@ _core_src = Path(__file__).resolve().parent.parent / "src"
 if _core_src.exists() and str(_core_src) not in sys.path:
     sys.path.insert(0, str(_core_src))
 
-from kpi_agent_core import embed_document, DEFAULT_EMBED_MODEL, DEFAULT_OLLAMA_BASE_URL
+# Импорт только из embeddings, чтобы не загружать langgraph (избегаем ошибки uuid_utils на Windows)
+from kpi_agent_core.embeddings import embed_document, DEFAULT_EMBED_MODEL, DEFAULT_OLLAMA_BASE_URL
 
 
 def main():
@@ -33,8 +34,8 @@ def main():
     )
     parser.add_argument(
         "--out", "-o",
-        default="embed_result.json",
-        help="Файл для сохранения результата (по умолчанию embed_result.json)",
+        default="out/embed_result.json",
+        help="Файл для сохранения результата (по умолчанию out/embed_result.json)",
     )
     parser.add_argument(
         "--type",
