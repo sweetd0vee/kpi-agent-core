@@ -14,9 +14,9 @@ dependencies = [
     "langchain-core>=0.3.0",
     "httpx>=0.26.0",
 ]
-
 [project.optional-dependencies]
 dev = ["pytest", "pytest-asyncio"]
+docx = ["python-docx>=1.0.0"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

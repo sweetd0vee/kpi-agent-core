@@ -132,6 +132,50 @@ result = graph.invoke({
 
 **Важно:** в LLM не передают JSON с векторами. Модель работает только с текстом. Эмбеддинги нужны лишь для выбора релевантных документов; в промпт подставляется полный текст этих документов (из `text_full` или файла по `source_path`). При желании перед текстом можно добавить подпись из `RETRIEVED_DOCUMENTS_HEADER`.
 
+## Преобразование чеклистов (txt, docx) в JSON
+
+Загруженные файлы в виде пронумерованных чеклистов можно превращать в JSON: локальной LLM проще обрабатывать структурированный JSON, чем сырой текст.
+
+**Формат чеклиста:** заголовок документа, разделы с номерами («1. Название раздела»), пункты со строками `[ ] текст`. Разделители секций — длинные линии из `=`, `—` и т.п.
+
+**Результат:** объект `{ "title": "...", "sections": [ { "number": 1, "title": "...", "items": ["пункт 1", "пункт 2"] }, ... ] }`.
+
+### Файл → JSON
+
+```python
+from kpi_agent_core import file_to_checklist_json, save_checklist_json
+
+# txt или docx (для docx нужен pip install ".[docx]")
+data = file_to_checklist_json("raw/checklist_business_plan.txt")
+# data["title"], data["sections"]; при ошибке — data.get("error")
+
+save_checklist_json(data, "out/checklist_business_plan.json")
+```
+
+Только текст (например, уже загруженная строка):
+
+```python
+from kpi_agent_core import checklist_text_to_json
+
+text = open("raw/checklist.txt", encoding="utf-8").read()
+data = checklist_text_to_json(text)
+```
+
+### Документы для каскада в виде JSON-строк
+
+Чтобы в промпт каскада подставлять не сырой текст, а JSON каждого документа:
+
+```python
+from kpi_agent_core import load_documents_from_paths, documents_dict_to_json_strings
+
+documents = load_documents_from_paths(business_plan_path="raw/checklist_business_plan.txt", ...)
+# Словарь ключ → JSON-строка (чеклист разобран в структуру)
+documents_json = documents_dict_to_json_strings(documents)
+# Далее в шаблон промпта подставлять documents_json["business_plan"] и т.д.
+```
+
+Зависимость для .docx: `pip install ".[docx]"` (опционально).
+
 ## Каскад целей главного руководителя → подчинённые (таблица)
 
 Задача: по целям главного руководителя и приложенным документам (Бизнес-план, Стратегия, Регламент, Положение о департаменте, известные цели подчинённых) получить таблицу каскадированных целей: для каждого подчинённого — релевантные цели руководителя и сформулированные цели подчинённого.

@@ -47,6 +47,9 @@ def __getattr__(name):
                 "chunk_text", "chunk_by_sections", "save_chunk_index", "load_chunk_index"):
         from kpi_agent_core import doc_preprocess
         return getattr(doc_preprocess, name)
+    if name in ("checklist_text_to_json", "file_to_checklist_json", "checklist_json_to_text_for_llm", "save_checklist_json", "documents_dict_to_json_strings"):
+        from kpi_agent_core import checklist_to_json
+        return getattr(checklist_to_json, name)
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
@@ -90,4 +93,9 @@ __all__ = [
     "load_embedding_index",
     "retrieve_relevant_documents",
     "retrieved_texts_to_checklists_string",
+    "checklist_text_to_json",
+    "file_to_checklist_json",
+    "checklist_json_to_text_for_llm",
+    "save_checklist_json",
+    "documents_dict_to_json_strings",
 ]
