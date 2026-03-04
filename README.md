@@ -60,6 +60,26 @@ result = embed_document(
 
 Перед вызовом: `ollama pull qwen3-embedding` и запущенный Ollama.
 
+### Как протестировать создание эмбеддинга
+
+1. Запустите Ollama и загрузите модель:
+   ```bash
+   ollama pull qwen3-embedding
+   ```
+
+2. Из папки **kpi-agent-core** (установлено ядро: `pip install .` или `pip install -e .`):
+   ```bash
+   cd kpi-agent-core
+   python scripts/run_embed.py
+   ```
+   Скрипт возьмёт документ из `../kpi-agent-backend/uploads/business_plan_checklist/` и сохранит результат в `embed_result.json`.
+
+3. Свои файл и выход:
+   ```bash
+   python scripts/run_embed.py path/to/checklist.txt --out my_embed.json
+   python scripts/run_embed.py path/to/doc.txt --type strategy_checklist -o out.json
+   ```
+
 ## Запуск тестов
 
 ```bash
